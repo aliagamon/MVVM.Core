@@ -8,6 +8,7 @@ namespace MVVM.Core.Services
         void LogWarning(string message);
         void LogError(string message);
         void LogException(Exception exception);
+        void Assert(bool condition, string message = null);
     }
 
     public abstract class Logger : ILogger
@@ -17,6 +18,7 @@ namespace MVVM.Core.Services
         public abstract void Log(string message);
         public abstract void LogWarning(string message);
         public abstract void LogError(string message);
+        public abstract void Assert(bool condition, string message = null);
         public virtual  void LogException(Exception exception) =>
             LogError(exception.ToString());
 
@@ -52,6 +54,12 @@ namespace MVVM.Core.Services
             Logger.Instance.LogException(exception);
         }
 
+        public static void Assert(bool condition, string message = null)
+        {
+            CheckLoggerInstance();
+            Logger.Instance.Assert(condition, message);
+        }
+
         private static void CheckLoggerInstance()
         {
             if (Logger.Instance is null)
@@ -74,6 +82,14 @@ namespace MVVM.Core.Services
         public override void LogError(string message)
         {
             WriteWithColor(message, ConsoleColor.Red);
+        }
+
+        public override void Assert(bool condition, string message = null)
+        {
+            if(message is null)
+                System.Diagnostics.Debug.Assert(condition);
+            else
+                System.Diagnostics.Debug.Assert(condition, message);
         }
 
         private static void WriteWithColor(string message, ConsoleColor color)
